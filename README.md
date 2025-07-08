@@ -19,7 +19,19 @@
   - 영속: 영속성 컨텍스트에 저장된 상태
   - 준영속: 영속성 컨텍스트에 저장되었다가 분리된 상태
   - 삭제: 삭제된 상태
-- 영속성 컨텍스트 
+- 엔티티 맵핑 어노테이션
+  - @Entity
+    - JPA를 사용해서 테이블과 매핑할 클래스 지정
+      - name: JPA에서 사용할 엔티티 이름. 기본값은 클래스 이름
+    - 기본 생성자 필수(파라미터가 없는 public 또는 protected 생성자)
+    - final 클래스, enum, interface, inner 클래스에는 사용 불가
+    - 저장할 필드에 final을 사용하면 안됨.
+  - @Table
+    - 엔티티와 매핑할 테이블을 지정.
+      - name: 매핑할 테이블 이름. 기본값은 엔티티 이름
+      - catalog: 데이터베이스의 catalog 매핑
+      - schema: 데이터베이스의 schema 매핑
+      - uniqueConstraints(DDL) : DDL 생성 시, 유니크 제약조건을 만듦.
   
 ## 💡 Useful Tips
 - **엔티티 매니저**
