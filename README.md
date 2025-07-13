@@ -6,7 +6,15 @@
   - view, controller 테스트
   - h2 db 설치
 - 2025-07-10
-  - 엔티티 설계
+  - 엔티티 설계 시작
+- 2025-07-12
+  - 엔티티 설계 완료
+- 2025-07-13 (기능 구현 시작)
+  - 회원 도메인 개발
+    - 회원 기능 구현 (repository 및 service)
+      - 회원 등록
+      - 회원 목록 조회
+    - 회원 기능 테스트
 
 ## 📘 Key Learnings
 - **JPA 개념**
@@ -34,6 +42,27 @@
       - catalog: 데이터베이스의 catalog 매핑
       - schema: 데이터베이스의 schema 매핑
       - uniqueConstraints(DDL) : DDL 생성 시, 유니크 제약조건을 만듦.
+  - @PersistenceContext는 스프링이 관리하는 EntityManager를 자동 주입해주는 어노테이션이다.
+
+
+- EntityManager 주요 기능 정리표
+
+  | 메서드                                             | 기능           | 설명                                                            |
+  | ----------------------------------------------- | ------------ | ------------------------------------------------------------- |
+  | `persist(Object entity)`                        | **등록**       | 새 엔티티를 영속성 컨텍스트에 저장 (INSERT 예정)                               |
+  | `find(Class<T> entityClass, Object primaryKey)` | **단건 조회**    | 기본 키(PK)로 엔티티 조회                                              |
+  | `createQuery(...)`                              | **JPQL 실행**  | JPQL 쿼리 실행 (객체 중심 질의)                                         |
+  | `createNativeQuery(...)`                        | **SQL 실행**   | 순수 SQL 쿼리 실행                                                  |
+  | `remove(Object entity)`                         | **삭제**       | 엔티티를 영속성 컨텍스트 및 DB에서 삭제                                       |
+  | `merge(Object entity)`                          | **병합(갱신)**   | 준영속(detached) 상태의 엔티티를 다시 영속 상태로 갱신                           |
+  | `flush()`                                       | **동기화**      | 영속성 컨텍스트의 변경 내용을 DB에 반영 (SQL 실행)                              |
+  | `clear()`                                       | **비우기**      | 영속성 컨텍스트 초기화 (1차 캐시 날림)                                       |
+  | `detach(Object entity)`                         | **비영속화**     | 특정 엔티티만 영속성 컨텍스트에서 분리                                         |
+  | `contains(Object entity)`                       | **영속 여부 확인** | 해당 엔티티가 영속 상태인지 확인                                            |
+  | `getReference(...)`                             | **프록시 조회**   | 엔티티를 실제 조회하지 않고 프록시로 가져옴 (LAZY 로딩)                            |
+  | `close()`                                       | **종료**       | EntityManager 종료 (더 이상 사용 불가)                                 |
+  | `getTransaction()`                              | **트랜잭션 제어**  | `begin()`, `commit()`, `rollback()` 등을 통해 수동 트랜잭션 제어 (JPA 표준) |
+
 
 - 일대다(1:N) 양방향 관계 설정
 
@@ -119,3 +148,26 @@
   - 편의 메서드(연관관계 메서드)를 어디에 둘지는 **연관관계의 주인 여부와는 별개**로 **객체 구조와 의미**를 기준(부모냐 자식이냐, 사용 흐름 등)으로 판단한다.
 - 임베디드 타입(@Embeddable)은 자바 기본 생성자를 public 또는 protected로 설정해야 한다. public 보다는 protected가 그나마 더 안전.
 
+# Spring Tips
+- 필드 주입보다 생성자 주입이 좋은 이유
+
+  | 항목          | 필드 주입 (`@Autowired`) | 생성자 주입 (`@RequiredArgsConstructor`) |
+  | ----------- | -------------------- | ----------------------------------- |
+  | **불변성**     | 주입 후에도 변경 가능         | 생성 시점 이후 값 변경 불가 (`final`)          |
+  | **테스트 용이성** | DI 프레임워크 없이는 주입 불가   | 테스트 시 생성자로 직접 주입 가능                 |
+  | **명확성**     | 의존성 보이지 않음           | 생성자를 통해 의존성 명확히 표현됨                 |
+  | **컴파일 안정성** | 누락되어도 컴파일 됨 (런타임 오류) | 의존성 누락 시 컴파일 에러                     |
+  | **순환참조 감지** | 늦게 발견됨               | 빨리 감지 가능 (생성자 주입 시점)                |
+  | **리팩토링**    | 주입 대상 추적 어려움         | 생성자에 명시돼 추적 쉬움                      |
+
+- 테스트 케이스를 위한 환경 설정
+  - 테스트는 케이스 격리된 환경에서 실행하고, 끝나면 데이터를 초기화하는 것이 좋다. 그런 면에서 메모리 DB를 사용하는 것이 가장 이상적이다.
+  - 추가로 테스트 케이스를 위한 스프링 환경과, 일반적으로 애플리케이션을 실행하는 환경은 보통 다르므로 설정 파일을 다르게 사용하자.
+  - `test/resources/application.yml` 이 위치에 설정 파일이 없으면, `src/resources/application.yml`를 읽어 온다.
+  - 스프링 부트는 datasource 설정이 없으면, 기본적을 메모리 DB를 사용하고, driver-class도 현재 등록된 라이브러를 보고 찾아준다. 추가로 ddl-auto 도 create-drop 모드로 동작한다. 따라서 데이터소스나, JPA 관련된 별도의 추가 설정을 하지 않아도 된다.
+- JUnit과 AssertJ에서의 Assertions 클래스 충돌
+  - Assertions 라는 클래스 이름이 JUnit과 AssertJ 모두에 존재.
+    - org.junit.jupiter.api.Assertions → assertThrows(), assertEquals() 등
+    - org.assertj.core.api.Assertions → assertThat(), assertThatThrownBy() 등
+  - 그래서 두 라이브러리의 기능을 모두 사용하기 위해서는 static import를 사용해야 함.
+    - 그러면 같은 이름의 클래스더라도 메서드만 개별적으로 사용 가능 + 가독성 향상
