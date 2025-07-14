@@ -15,6 +15,14 @@
       - 회원 등록
       - 회원 목록 조회
     - 회원 기능 테스트
+- 2025-07-14
+  - 상품(`Item`) 도메인 개발
+    - 상품 등록
+    - 상품 목록 조회
+    - 상품 수정
+  - 주문(`Order`,`OrderItem`) 도메인 개발
+    - 상품 주문
+    - 주문 취소
 
 ## 📘 Key Learnings
 - **JPA 개념**
@@ -101,7 +109,13 @@
 | `JOINED`          | 부모/자식 각각 테이블 생성 + 조인       | ✅ 정규화됨<br>❌ 조인 많아져서 성능 낮음       |
 | `TABLE_PER_CLASS` | 자식 클래스마다 테이블 따로 생성         | ❌ 잘 안 씀 (조회 비효율적)               |
 
- 
+- 도메인 모델 패턴과 트랜잭션 스크립트 패턴
+  주문 서비스의 주문과 주문 취소 메서드를 보면 비즈니스 로직 대부분이 엔티티에 있다.
+  서비스 계층은 단순히 엔티티에 필요한 요청을 위임하는 역할을 한다.
+  이처럼 엔티티가 비즈니스 로직을 가지고 객체 지향의 특성을 적극 활용하는 것을 도메인 모델 패턴(http://martinfowler.com/eaaCatalog/domainModel.html)이라 한다.
+  반대로 엔티티에는 비즈니스 로직이 거의 없고 서비스 계층에서 대부분의 비즈니스 로직을 처리하는 것을 트랜잭션 스크립트 패턴(http://martinfowler.com/eaaCatalog/transactionScript.html)이라 한다.
+
+
 ## 💡 Useful Tips
 - **엔티티 매니저**
   - 엔티티 매니저는 만드는 비용이 상당히 크다. -> 한 개만 만들어서 어플리케이션 전체에서 공유하도록 설계.
@@ -147,6 +161,13 @@
 - 연관관계 편의 메서드
   - 편의 메서드(연관관계 메서드)를 어디에 둘지는 **연관관계의 주인 여부와는 별개**로 **객체 구조와 의미**를 기준(부모냐 자식이냐, 사용 흐름 등)으로 판단한다.
 - 임베디드 타입(@Embeddable)은 자바 기본 생성자를 public 또는 protected로 설정해야 한다. public 보다는 protected가 그나마 더 안전.
+
+- JPQL / CriteriaQuery에서는 엔티티(객체) 자체를 바인딩 값으로 넘길 수 있다. 내부적으로는 해당 엔티티의 식별자(ID) 값이 사용되어 비교가 이뤄진다.
+  ```java
+  em.createQuery("select o from Order o where member = :member", Order.class)
+                .setParameter("member",member)
+                .getResultList();
+  ```
 
 # Spring Tips
 - 필드 주입보다 생성자 주입이 좋은 이유
