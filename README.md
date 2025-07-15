@@ -23,6 +23,9 @@
   - 주문(`Order`,`OrderItem`) 도메인 개발
     - 상품 주문
     - 주문 취소
+- 2025-07-15
+  - 주문(`OrderSearch`) 도메인 개발
+    - 주문 검색 기능 (현재는 jpql로 구현. 추후 QueryDSL로 수정할 계획)
 
 ## 📘 Key Learnings
 - **JPA 개념**
@@ -114,6 +117,24 @@
   서비스 계층은 단순히 엔티티에 필요한 요청을 위임하는 역할을 한다.
   이처럼 엔티티가 비즈니스 로직을 가지고 객체 지향의 특성을 적극 활용하는 것을 도메인 모델 패턴(http://martinfowler.com/eaaCatalog/domainModel.html)이라 한다.
   반대로 엔티티에는 비즈니스 로직이 거의 없고 서비스 계층에서 대부분의 비즈니스 로직을 처리하는 것을 트랜잭션 스크립트 패턴(http://martinfowler.com/eaaCatalog/transactionScript.html)이라 한다.
+
+- 객체지향 쿼리
+  - JPQL (Java Persistence Query Language)
+    - 
+  - Criteria Query
+    - JPQL을 편하게 작성하도록 도와주는 API, 빌더 클래스 모음
+    - 장점: 문자가 아닌 `query.select(m).where(...)`처럼 프로그래밍 코드로 JPQL을 작성할 수 있다.
+      - 컴파일 시점에 오류를 발견할 수 있다.
+      - IDE를 사용하면 코드 자동완성 지원
+      - 동적 쿼리 작성 편함
+    - 단점: 모든 장점을 상쇄할 정도로 복잡하고 장황하다.
+  - QueryDSL
+    - Criteria Query처럼 JPQL을 편하게 작성하도록 도와주는 빌더 클래스 모음, 비표준 오픈소스 프레임워크
+    - 장점: 코드 기반이면서, 단순하고 사용하기 쉽다. (Criteria보다 훨씬 간단하다.)
+  - 네이티브 SQL
+    - JPA에서 JPQL 대신 직접 SQL을 사용할 수 있다.
+    - 장점: 특정 데이터베이스에서만 동작하는 SQL을 작성할 수 있다.
+    - 단점: 특정 데이터베이스에 의존하는 SQL을 작성해야 한다.
 
 
 ## 💡 Useful Tips

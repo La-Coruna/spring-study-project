@@ -11,6 +11,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -78,6 +80,30 @@ class OrderServiceTest {
         Order order = orderRepository.findOne(orderId);
         assertThat(order.getStatus()).isEqualTo(OrderStatus.CANCEL);
         assertThat(book.getStockQuantity()).isEqualTo(initialStockQuantity);
+    }
+    
+    @Test
+    public void 주문검색() throws Exception{
+        //given
+        Member member = createMember();
+        int initialStockQuantity = 10;
+        Book book = createBook("test-book", 10000, initialStockQuantity);
+        int orderCount = 2;
+
+        //when
+        Long orderId = orderService.order(member.getId(), book.getId(), orderCount);
+
+        OrderSearch orderSearch = new OrderSearch();
+        orderSearch.setOrderStatus(OrderStatus.ORDER);
+        orderSearch.setMemberName(member.getName());
+        Order order = orderService.findOrders(orderSearch).getFirst();
+
+        //then
+        assertThat(order.getStatus()).withFailMessage("상품 주문시 주문상태는 ORDER").isEqualTo(OrderStatus.ORDER);
+        assertThat(order.getOrderItems().size()).withFailMessage("주문한 상품 종류 수가 정확").isEqualTo(1);
+        assertThat(book.getStockQuantity()).withFailMessage("주문한 수만큼 상품 재고 차감").isEqualTo(initialStockQuantity - orderCount);
+        assertThat(order.getTotalPrice()).withFailMessage("총 가격 = 책 가격 * 주문 개수").isEqualTo(book.getPrice() * orderCount);
+        assertThat(order.getDelivery().getAddress()).withFailMessage("배송지 정보 잘 기입됐는지 확인").isEqualTo(member.getAddress());
     }
     
     private Member createMember(){
