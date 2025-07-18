@@ -35,6 +35,11 @@
     - 상품 등록
     - 상품 조회
     - 상품 수정
+- 2025-07-18
+  - 주문 기능 개발
+    - 주문 등록
+    - 주문 조회
+    - 주문 취소
 
 ## 📘 Spring MVC 개념
 - 서버의 데이터를 동적으로 렌더링하는 2가지 방법 (SSR vs CSR)
@@ -212,10 +217,71 @@
                 .setParameter("member",member)
                 .getResultList();
   ```
+
+## Thymeleaf
+- ### 📌 1. 서버 → HTML: 데이터 출력 바인딩  
+  #### 🔧 사용 목적  
+  서버 객체의 값을 HTML에 뿌려주기 (예: 회원 이름 리스트 출력, 기본값 설정 등)
+  #### 💡 사용하는 속성들  
   
+  | 타임리프 속성              | 역할                              |
+  | -------------------- | ------------------------------- |
+  | `th:object="${obj}"` | 폼 전체에 기본 객체 지정                  |
+  | `th:field="*{속성}"`   | `th:object`로 지정된 객체의 속성을 필드에 연결 |
+  | `${obj.prop}`        | 일반 텍스트 바인딩용 (읽기 전용)             |
+  
+  ✅ 예제
+  ```java
+  model.addAttribute("member", new Member("홍길동"));
+  ```
+  ```html
+  <form th:object="${member}">
+      <input type="text" th:field="*{name}" />
+  </form>
+  ```
+  🔽 렌더링 결과:
+  
+  ```html
+  <input type="text" name="name" id="name" value="홍길동" />
+  ```
+
+- ### 📌 2. HTML → 서버: 입력값 수신 바인딩
+  #### 🔧 사용 목적
+  사용자가 `<form>`에 입력한 데이터를 서버의 객체나 파라미터로 받기
+  
+  #### 💡 처리 방식
+  ##### ① 객체 바인딩 방식 (@ModelAttribute 사용)
+  ```html
+  <form th:object="${member}" action="/save" method="post">
+      <input type="text" th:field="*{name}" />
+      <input type="text" th:field="*{email}" />
+  </form>
+  ```
+  ```java
+  @PostMapping("/save")
+  public String saveMember(@ModelAttribute Member member) {
+      // member.getName(), member.getEmail() 등 자동 바인딩
+      return "redirect:/";
+  }
+  ```
+  타임리프가 생성하는 `<input>`의 name 속성과 Java 필드명이 자동 매칭됩니다.
+  
+  ##### ② 개별 파라미터 바인딩 방식 (@RequestParam 사용)
+  ```html
+  <form action="/submit" method="post">
+      <input type="text" name="name" />
+  </form>
+  ```
+  ```java
+  @PostMapping("/submit")
+  public String handle(@RequestParam("name") String name) {
+      // name = 사용자 입력 값
+  }
+  ```
+
 - 타임리프에서 ?를 사용하면 null 을 무시한다.
 
-# Spring Tips
+## Spring Tips
 - 필드 주입보다 생성자 주입이 좋은 이유
 
   | 항목          | 필드 주입 (`@Autowired`) | 생성자 주입 (`@RequiredArgsConstructor`) |
