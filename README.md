@@ -304,3 +304,5 @@
     - org.assertj.core.api.Assertions → assertThat(), assertThatThrownBy() 등
   - 그래서 두 라이브러리의 기능을 모두 사용하기 위해서는 static import를 사용해야 함.
     - 그러면 같은 이름의 클래스더라도 메서드만 개별적으로 사용 가능 + 가독성 향상
+- SpringBoot 3.x.x 버전에서 P6Spy 적용하기 위해선 최소 1.9.0 이상의 버전을 사용해야 한다.
+  `	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.9.0'`
