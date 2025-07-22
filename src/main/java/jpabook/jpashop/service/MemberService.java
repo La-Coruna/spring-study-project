@@ -21,6 +21,12 @@ public class MemberService {
         return memberRepository.save(member);
     }
 
+    @Transactional
+    public void update(Long id, String name){
+        Member member = memberRepository.findOne(id);
+        member.setName(name);
+    }
+
     public void validateDuplicateMember(Member member){
         if(!memberRepository.findByName(member.getName()).isEmpty())
             throw new IllegalStateException("이미 존재하는 회원입니다.");
