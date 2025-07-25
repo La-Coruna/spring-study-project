@@ -1,6 +1,7 @@
 package jpabook.jpashop.controller;
 
 import jakarta.validation.Valid;
+import jpabook.jpashop.controller.form.BookForm;
 import jpabook.jpashop.domain.Book;
 import jpabook.jpashop.domain.Item;
 import jpabook.jpashop.service.ItemService;

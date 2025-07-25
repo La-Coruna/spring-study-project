@@ -15,6 +15,13 @@ public class Member {
     @Column(name = "member_id")
     private Long id;
 
+    @Column(nullable = false, unique = true, length = 30)
+    private String loginId;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false)
     private String name;
 
     @Embedded
