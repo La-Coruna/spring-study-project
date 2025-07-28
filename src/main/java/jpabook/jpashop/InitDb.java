@@ -1,5 +1,6 @@
 package jpabook.jpashop;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jpabook.jpashop.domain.*;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class InitDb {
     private final InitService initService;
+
+    @PostConstruct
+    public void init() {
+        initService.dbInit1();
+    }
 
     @Component
     @RequiredArgsConstructor

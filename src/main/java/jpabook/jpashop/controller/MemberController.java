@@ -40,12 +40,7 @@ public class MemberController {
             return "members/createMemberForm";
         }
 
-        Member member = new Member();
-        member.setName(memberForm.getName());
-        Address address = new Address(memberForm.getCity(),memberForm.getStreet(), memberForm.getZipcode());
-        member.setAddress(address);
-
-        memberService.join(member);
+        memberService.join(memberForm.toEntity());
 
         return "redirect:/";
     }
