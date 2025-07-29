@@ -1,7 +1,9 @@
 package jpabook.jpashop.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.MemberService;
+import jpabook.jpashop.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -13,8 +15,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 @RequiredArgsConstructor
 public class HomeController {
-    private final MemberService memberService;
-
+    private final SessionManager sessionManager;
+    /*
     @GetMapping("/")
     public String homeLogin(@CookieValue(name = "memberId", required = false) Long memberId, Model model){
         if(memberId == null){
@@ -30,6 +32,21 @@ public class HomeController {
 
         log.info("로그인되어 있음.");
         model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+    */
+
+    @GetMapping("/")
+    public String homeLoginV2(HttpServletRequest request, Model model){
+        Member member = (Member)sessionManager.getSession(request);
+
+        if(member == null){
+            log.info("로그인 X");
+            return "home";
+        }
+
+        log.info("로그인 O");
+        model.addAttribute("member", member);
         return "loginHome";
     }
 }
