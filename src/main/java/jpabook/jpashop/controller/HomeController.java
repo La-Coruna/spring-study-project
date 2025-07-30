@@ -1,8 +1,10 @@
 package jpabook.jpashop.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.MemberService;
+import jpabook.jpashop.session.SessionConst;
 import jpabook.jpashop.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 @Slf4j
 @Controller
@@ -37,16 +40,14 @@ public class HomeController {
     */
 
     @GetMapping("/")
-    public String homeLoginV2(HttpServletRequest request, Model model){
-        Member member = (Member)sessionManager.getSession(request);
-
-        if(member == null){
+    public String homeLoginV3Spring(@SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginMember, Model model){
+        if(loginMember == null){
             log.info("로그인 X");
             return "home";
         }
 
         log.info("로그인 O");
-        model.addAttribute("member", member);
+        model.addAttribute("member", loginMember);
         return "loginHome";
     }
 }

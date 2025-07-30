@@ -64,7 +64,9 @@
     - 세션 생성
     - 세션 조회
     - 세션 만료
-- 다음 : 로그인 기능 구현 4 : 세션을 이용해 로그인 처리 - 서블릿 HTTP 세션 사용
+- 2025-07-30
+  - 로그인 기능 구현 4 : 쿠키+세션 사용 - 서블릿 HTTP 세션 사용
+- 다음 : 서블릿 필터
 
 ## 프로젝트 설정
 ### H2 데이터베이스 설정
@@ -456,3 +458,26 @@
 ### 💡 요약: 한 문장으로
 - `request`: **"사용자가 뭘 보냈는지"** 읽기 위한 용도
 - `response`: **"서버가 뭘 보낼지"** 설정하기 위한 용도
+
+## HttpSession 소개
+- 서블릿을 통해 `HttpSession` 을 생성하면 자동으로 `JSESSIONID`라는 키와 추정 불가능한 값으로 쿠키를 생성한다.
+- `request.getSession()`를 호출하면 내부적으로 자동으로 HttpServletResponse에 Set-Cookie 헤더를 추가해서 JSESSIONID 쿠키를 생성 및 전송한다.
+- 세션 생성과 조회
+  - 세션을 생성하려면 `request.getSession(true)` 를 사용하면 된다.
+  - `public HttpSession getSession(boolean create);`
+  - 세션의 `create` 옵션에 대해 알아보자.
+    - `request.getSession(true)`
+      - 세션이 있으면 기존 세션을 반환한다.
+      - 세션이 없으면 새로운 세션을 생성해서 반환한다.
+    - `request.getSession(false)`
+      - 세션이 있으면 기존 세션을 반환한다.
+      - 세션이 없으면 새로운 세션을 생성하지 않는다. `null` 을 반환한다.
+    - `request.getSession()` : 신규 세션을 생성하는 `request.getSession(true)` 와 동일하다.
+- 세션 삭제
+  - `session.invalidate()` : 세션을 제거한다.
+- @SessionAttribute
+  - 이미 로그인 된 사용자를 찾을 때는 다음과 같이 사용하면 된다. 참고로 이 기능은 세션을 생성하지 않는다.
+  - `@SessionAttribute(name = "loginMember", required = false) Member loginMember`
+- session 설정
+  - `application.properties`에 `server.servlet.session.tracking-modes=cookie`를 설정해주면, 첫 로그인 시 url에 `jsessionid`가 노출되는 것을 막을 수 있다.
+  - `application.properties`에 `server.servlet.session.timeout=60`를 통해 최근 접속 시간을 기준으로 타임아웃 설정을 할 수 있다. (60은 1분) 

@@ -3,10 +3,12 @@ package jpabook.jpashop.controller;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import jpabook.jpashop.controller.form.LoginForm;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.service.LoginService;
+import jpabook.jpashop.session.SessionConst;
 import jpabook.jpashop.session.SessionManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +31,7 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String loginV2(@ModelAttribute @Valid LoginForm loginForm, BindingResult bindingResult, HttpServletResponse response){
+    public String loginV3(@ModelAttribute @Valid LoginForm loginForm, BindingResult bindingResult, HttpServletRequest request){
         if(bindingResult.hasErrors()){
             return "login/loginForm";
         }
@@ -43,8 +45,9 @@ public class LoginController {
         }
 
         // 로그인 성공 처리
-        // sessionManager에서 세션을 생성히고, response에 쿠키로 세션ID를 설정해줌.
-        sessionManager.createSession(loginMember, response);
+        // HttpSession을 통해 세션을 생성하고, loginMember와 연결.
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginMember);
 
         return "redirect:/";
     }
@@ -55,8 +58,11 @@ public class LoginController {
      * 하지만 서버 쪽에서 그 세션을 무효화했기 때문에 다시 로그인해야 하는 상태.
      */
     @PostMapping("/logout")
-    public String logoutV2(HttpServletRequest request){
-        sessionManager.expire(request);
+    public String logoutV3(HttpServletRequest request){
+        HttpSession session = request.getSession(false);
+        if(session != null){
+            session.invalidate(); // 세션을 삭제
+        }
         return "redirect:/";
     }
 
